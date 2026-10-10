@@ -63,12 +63,15 @@ class _MonthYearPickerSheetState extends State<MonthYearPickerSheet> {
     final now = DateTime.now();
 
     return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 540),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
             // Drag handle
             Center(
               child: Container(
@@ -214,8 +217,10 @@ class _MonthYearPickerSheetState extends State<MonthYearPickerSheet> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   Widget _buildYearsGrid() {
     final currentYear = DateTime.now().year;
@@ -256,12 +261,15 @@ class _MonthYearPickerSheetState extends State<MonthYearPickerSheet> {
                     : (isCurrentYear ? AppTheme.accentBrownLight : AppTheme.separatorBeige),
               ),
             ),
-            child: Text(
-              '$year',
-              style: AppTheme.sansBody.copyWith(
-                color: isSelected ? AppTheme.paperBackground : AppTheme.inkPrimary,
-                fontWeight: isSelected || isCurrentYear ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 14,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                '$year',
+                style: AppTheme.sansBody.copyWith(
+                  color: isSelected ? AppTheme.paperBackground : AppTheme.inkPrimary,
+                  fontWeight: isSelected || isCurrentYear ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 14,
+                ),
               ),
             ),
           ),
@@ -305,12 +313,15 @@ class _MonthYearPickerSheetState extends State<MonthYearPickerSheet> {
                 width: isCurrentMonth && !isSelected ? 1.4 : 1.0,
               ),
             ),
-            child: Text(
-              _months[index],
-              style: AppTheme.sansBody.copyWith(
-                color: isSelected ? AppTheme.paperBackground : AppTheme.inkPrimary,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 13.5,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                _months[index],
+                style: AppTheme.sansBody.copyWith(
+                  color: isSelected ? AppTheme.paperBackground : AppTheme.inkPrimary,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 13.5,
+                ),
               ),
             ),
           ),

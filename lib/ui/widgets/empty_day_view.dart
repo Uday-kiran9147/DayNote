@@ -30,14 +30,15 @@ class EmptyDayView extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Action buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 10,
             children: [
               _buildActionButton(
                 label: '+ Add Todo',
                 onTap: onAddTodo,
               ),
-              const SizedBox(width: 12),
               _buildActionButton(
                 label: '+ Add Note',
                 onTap: onAddNote,

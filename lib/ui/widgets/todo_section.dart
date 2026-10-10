@@ -124,8 +124,14 @@ class _TodoSectionState extends State<TodoSection> {
     }
   }
 
+  String _capitalizeSentence(String input) {
+    final trimmed = input.trim();
+    if (trimmed.isEmpty) return trimmed;
+    return trimmed[0].toUpperCase() + trimmed.substring(1);
+  }
+
   void _submitNewTodo() {
-    final text = _addController.text.trim();
+    final text = _capitalizeSentence(_addController.text);
     if (text.isNotEmpty) {
       widget.onAddTodo(text, _selectedPriority);
       _addController.clear();
@@ -139,7 +145,7 @@ class _TodoSectionState extends State<TodoSection> {
   }
 
   void _finishAdding() {
-    final text = _addController.text.trim();
+    final text = _capitalizeSentence(_addController.text);
     if (text.isNotEmpty) {
       widget.onAddTodo(text, _selectedPriority);
       _addController.clear();
@@ -215,7 +221,7 @@ class _TodoSectionState extends State<TodoSection> {
   }
 
   void _submitEditing(String id) async {
-    final text = _editController.text.trim();
+    final text = _capitalizeSentence(_editController.text);
     if (text.isNotEmpty) {
       widget.onUpdateTodo(id, text);
       if (widget.onUpdatePriority != null && _editingPriority != widget.todos.firstWhere((t) => t.id == id).priority) {
@@ -402,6 +408,7 @@ class _TodoSectionState extends State<TodoSection> {
                 controller: _editController,
                 focusNode: _editFocusNode,
                 style: AppTheme.sansBody,
+                textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
                 scrollPadding: const EdgeInsets.only(top: 24, bottom: 120),
                 inputFormatters: [
@@ -433,11 +440,15 @@ class _TodoSectionState extends State<TodoSection> {
               icon: const Icon(Icons.check, size: 18, color: AppTheme.inkPrimary),
               onPressed: () => _submitEditing(todo.id),
               visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
             ),
             IconButton(
               icon: const Icon(Icons.close, size: 18, color: AppTheme.inkTertiary),
               onPressed: () => setState(() => _editingTodoId = null),
               visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
             ),
           ],
         ),
@@ -478,16 +489,16 @@ class _TodoSectionState extends State<TodoSection> {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Row(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
-                    Flexible(
-                      child: Text(
-                        todo.text,
-                        style: todo.isDone ? AppTheme.sansBodyDone : AppTheme.sansBody,
-                      ),
+                    Text(
+                      todo.text,
+                      style: todo.isDone ? AppTheme.sansBodyDone : AppTheme.sansBody,
                     ),
-                    if (todo.priority != TodoPriority.none) ...[
-                      const SizedBox(width: 8),
+                    if (todo.priority != TodoPriority.none)
                       _buildPriorityBadge(
                         todo.priority,
                         onTap: () {
@@ -495,7 +506,6 @@ class _TodoSectionState extends State<TodoSection> {
                           widget.onUpdatePriority?.call(todo.id, next);
                         },
                       ),
-                    ],
                   ],
                 ),
               ),
@@ -553,6 +563,7 @@ class _TodoSectionState extends State<TodoSection> {
               controller: _addController,
               focusNode: _addFocusNode,
               style: AppTheme.sansBody,
+              textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.next,
               scrollPadding: const EdgeInsets.only(top: 24, bottom: 120),
               inputFormatters: [
@@ -589,12 +600,16 @@ class _TodoSectionState extends State<TodoSection> {
             icon: const Icon(Icons.arrow_downward, size: 16, color: AppTheme.accentBrown),
             tooltip: 'Add & Continue',
             visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
             onPressed: _submitNewTodo,
           ),
           IconButton(
             icon: const Icon(Icons.done, size: 18, color: AppTheme.inkPrimary),
             tooltip: 'Finished adding',
             visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
             onPressed: _finishAdding,
           ),
         ],

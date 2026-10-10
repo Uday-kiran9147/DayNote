@@ -67,16 +67,18 @@ class _AuthScreenState extends State<AuthScreen> {
         backgroundColor: AppTheme.paperBackground,
         body: SafeArea(
           child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-              physics: const BouncingScrollPhysics(),
-            child: ListenableBuilder(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                physics: const BouncingScrollPhysics(),
+                child: ListenableBuilder(
               listenable: widget.authViewModel,
               builder: (context, _) {
                 final vm = widget.authViewModel;
 
                 return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Brand / Logo Title
@@ -345,8 +347,11 @@ class _AuthScreenState extends State<AuthScreen> {
                     // Toggle mode footer
                     Center(
                       child: _mode == AuthMode.signIn
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                          ? Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 6,
+                              runSpacing: 4,
                               children: [
                                 Text(
                                   "Don't have an account?",
@@ -355,7 +360,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                     color: AppTheme.inkSecondary,
                                   ),
                                 ),
-                                const SizedBox(width: 6),
                                 InkWell(
                                   onTap: () => _switchMode(AuthMode.signUp),
                                   child: Text(
@@ -394,7 +398,8 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       ),
     ),
-  );
+  ),
+);
   }
 
   Widget _buildTextField({
@@ -432,6 +437,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: controller,
             keyboardType: keyboardType,
             obscureText: obscureText,
+            textCapitalization: TextCapitalization.none,
             style: AppTheme.sansBody,
             onTapOutside: (_) => FocusScope.of(context).unfocus(),
             decoration: InputDecoration(

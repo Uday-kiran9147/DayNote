@@ -197,6 +197,32 @@ void main() {
     expect(find.text('Explore the month & year calendar navigation'), findsOneWidget);
     expect(find.textContaining('Welcome to your Daynote journal'), findsOneWidget);
   });
+
+  testWidgets('TodoSection automatically capitalizes the first letter of submitted task sentences', (WidgetTester tester) async {
+    final repository = DayNoteRepositoryImpl();
+    final viewModel = DayNoteViewModel(repository: repository);
+    await viewModel.init();
+    await viewModel.dismissOnboarding(loadSampleData: false);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HomeScreen(viewModel: viewModel),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Click + Add Todo from empty state
+    await tester.tap(find.text('+ Add Todo'));
+    await tester.pumpAndSettle();
+
+    // Type in all lowercase sentence
+    await tester.enterText(find.byType(TextField).first, 'write quarterly performance reviews');
+    await tester.tap(find.byIcon(Icons.done));
+    await tester.pumpAndSettle();
+
+    // Verify it was capitalized to start with capital 'W'
+    expect(find.text('Write quarterly performance reviews'), findsOneWidget);
+  });
 }
 
 

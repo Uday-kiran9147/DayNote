@@ -130,132 +130,137 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Scaffold(
             backgroundColor: AppTheme.paperBackground,
             body: SafeArea(
-              child: Column(
-                children: [
-                  // Refined Top App Bar
-                  DaynoteAppBar(
-                    authViewModel: widget.authViewModel,
-                    onGoToToday: vm.goToToday,
-                    isTodaySelected: vm.isSelectedDateToday,
-                  ),
-
-                  // Main Scrollable Content
-                  Expanded(
-                    child: CustomScrollView(
-                    controller: _scrollController,
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    slivers: [
-                      // 1 & 2: Month & Calendar Grid
-                      SliverToBoxAdapter(
-                        child: CalendarWidget(
-                          currentMonth: vm.currentMonth,
-                          selectedDate: vm.selectedDate,
-                          datesWithContent: vm.datesWithContent,
-                          onDateSelected: (date) {
-                            setState(() {
-                              _forceShowTodoInput = false;
-                              _forceFocusNote = false;
-                            });
-                            vm.selectDate(date);
-                          },
-                          onPreviousMonth: vm.previousMonth,
-                          onNextMonth: vm.nextMonth,
-                          onMonthYearChanged: vm.setMonthYear,
-                          onGoToToday: vm.goToToday,
-                          onOpenAccount: widget.authViewModel != null
-                              ? () => AccountSheet.show(
-                                    context,
-                                    authViewModel: widget.authViewModel!,
-                                    onOpenWalkthrough: _showWalkthroughManual,
-                                  )
-                              : null,
-                        ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: Column(
+                    children: [
+                      // Refined Top App Bar
+                      DaynoteAppBar(
+                        authViewModel: widget.authViewModel,
+                        onGoToToday: vm.goToToday,
+                        isTodaySelected: vm.isSelectedDateToday,
                       ),
 
-                // 3: Selected Date Separator & Prominent Date Header
-                SliverToBoxAdapter(
-                  child: SelectedDateHeader(
-                    date: vm.selectedDate,
-                    isToday: vm.isSelectedDateToday,
+                      // Main Scrollable Content
+                      Expanded(
+                        child: CustomScrollView(
+                          controller: _scrollController,
+                          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
+                          ),
+                          slivers: [
+                            // 1 & 2: Month & Calendar Grid
+                            SliverToBoxAdapter(
+                              child: CalendarWidget(
+                                currentMonth: vm.currentMonth,
+                                selectedDate: vm.selectedDate,
+                                datesWithContent: vm.datesWithContent,
+                                onDateSelected: (date) {
+                                  setState(() {
+                                    _forceShowTodoInput = false;
+                                    _forceFocusNote = false;
+                                  });
+                                  vm.selectDate(date);
+                                },
+                                onPreviousMonth: vm.previousMonth,
+                                onNextMonth: vm.nextMonth,
+                                onMonthYearChanged: vm.setMonthYear,
+                                onGoToToday: vm.goToToday,
+                                onOpenAccount: widget.authViewModel != null
+                                    ? () => AccountSheet.show(
+                                          context,
+                                          authViewModel: widget.authViewModel!,
+                                          onOpenWalkthrough: _showWalkthroughManual,
+                                        )
+                                    : null,
+                              ),
+                            ),
+
+                            // 3: Selected Date Separator & Prominent Date Header
+                            SliverToBoxAdapter(
+                              child: SelectedDateHeader(
+                                date: vm.selectedDate,
+                                isToday: vm.isSelectedDateToday,
+                              ),
+                            ),
+
+                            // 4: Daily Content (Empty State or Todos & Notes)
+                            if (isEmptyDay) ...[
+                              SliverToBoxAdapter(
+                                child: EmptyDayView(
+                                  onAddTodo: () {
+                                    setState(() {
+                                      _forceShowTodoInput = true;
+                                    });
+                                    _scrollToContent();
+                                  },
+                                  onAddNote: () {
+                                    setState(() {
+                                      _forceFocusNote = true;
+                                    });
+                                    _scrollToContent();
+                                  },
+                                ),
+                              ),
+                            ] else ...[
+                              // TODO Section (Shown if has todos or if user clicked Add Todo)
+                              SliverToBoxAdapter(
+                                child: TodoSection(
+                                  todos: entry.todos,
+                                  isAddingInitial: _forceShowTodoInput,
+                                  onAddTodo: (text, priority) {
+                                    vm.addTodo(text, priority: priority);
+                                    setState(() {
+                                      _forceShowTodoInput = false;
+                                    });
+                                  },
+                                  onToggleTodo: vm.toggleTodo,
+                                  onUpdateTodo: vm.updateTodoText,
+                                  onUpdatePriority: vm.updateTodoPriority,
+                                  onDeleteTodo: vm.deleteTodo,
+                                  onCancelAdd: () {
+                                    setState(() {
+                                      _forceShowTodoInput = false;
+                                    });
+                                  },
+                                ),
+                              ),
+
+                              const SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 24.0),
+                                  child: Divider(height: 1),
+                                ),
+                              ),
+
+                              // NOTES Section (Shown always when not empty or when activated)
+                              SliverToBoxAdapter(
+                                child: NoteSection(
+                                  key: ValueKey('note_${entry.dateKey}'),
+                                  dateKey: entry.dateKey,
+                                  note: entry.note,
+                                  autoFocus: _forceFocusNote,
+                                  onNoteChanged: vm.onNoteChanged,
+                                ),
+                              ),
+                            ],
+
+                            // Extra padding for comfortable keyboard typing & scrolling
+                            const SliverToBoxAdapter(
+                              child: SizedBox(height: 120),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
-                // 4: Daily Content (Empty State or Todos & Notes)
-                if (isEmptyDay) ...[
-                  SliverToBoxAdapter(
-                    child: EmptyDayView(
-                      onAddTodo: () {
-                        setState(() {
-                          _forceShowTodoInput = true;
-                        });
-                        _scrollToContent();
-                      },
-                      onAddNote: () {
-                        setState(() {
-                          _forceFocusNote = true;
-                        });
-                        _scrollToContent();
-                      },
-                    ),
-                  ),
-                ] else ...[
-                  // TODO Section (Shown if has todos or if user clicked Add Todo)
-                  SliverToBoxAdapter(
-                    child: TodoSection(
-                      todos: entry.todos,
-                      isAddingInitial: _forceShowTodoInput,
-                      onAddTodo: (text, priority) {
-                        vm.addTodo(text, priority: priority);
-                        setState(() {
-                          _forceShowTodoInput = false;
-                        });
-                      },
-                      onToggleTodo: vm.toggleTodo,
-                      onUpdateTodo: vm.updateTodoText,
-                      onUpdatePriority: vm.updateTodoPriority,
-                      onDeleteTodo: vm.deleteTodo,
-                      onCancelAdd: () {
-                        setState(() {
-                          _forceShowTodoInput = false;
-                        });
-                      },
-                    ),
-                  ),
-
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Divider(height: 1),
-                    ),
-                  ),
-
-                  // NOTES Section (Shown always when not empty or when activated)
-                  SliverToBoxAdapter(
-                    child: NoteSection(
-                      key: ValueKey('note_${entry.dateKey}'),
-                      dateKey: entry.dateKey,
-                      note: entry.note,
-                      autoFocus: _forceFocusNote,
-                      onNoteChanged: vm.onNoteChanged,
-                    ),
-                  ),
-                ],
-
-                // Extra padding for comfortable keyboard typing & scrolling
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 120),
-                ),
-              ],
+              ),
             ),
           ),
-        ],
-      ),
-    ),
-  ),
-);
+        );
       },
     );
   }

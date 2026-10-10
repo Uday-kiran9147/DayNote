@@ -123,7 +123,7 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
 
               // Walkthrough Carousel
               SizedBox(
-                height: 235,
+                height: 250,
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: (index) {
@@ -134,52 +134,55 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
                   itemCount: _steps.length,
                   itemBuilder: (context, index) {
                     final step = _steps[index];
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppTheme.paperSurface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppTheme.separatorBeige),
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: AppTheme.paperSurface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppTheme.separatorBeige),
+                            ),
+                            child: Icon(
+                              step['icon'] as IconData,
+                              size: 26,
+                              color: AppTheme.accentBrown,
+                            ),
                           ),
-                          child: Icon(
-                            step['icon'] as IconData,
-                            size: 26,
-                            color: AppTheme.accentBrown,
+                          const SizedBox(height: 12),
+                          Text(
+                            step['title'] as String,
+                            style: AppTheme.serifHeading.copyWith(
+                              fontSize: 17.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          step['title'] as String,
-                          style: AppTheme.serifHeading.copyWith(
-                            fontSize: 17.5,
-                            fontWeight: FontWeight.w700,
+                          const SizedBox(height: 3),
+                          Text(
+                            step['subtitle'] as String,
+                            style: AppTheme.sansCaption.copyWith(
+                              color: AppTheme.accentBrown,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          step['subtitle'] as String,
-                          style: AppTheme.sansCaption.copyWith(
-                            color: AppTheme.accentBrown,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(height: 8),
+                          Text(
+                            step['description'] as String,
+                            style: AppTheme.sansBody.copyWith(
+                              fontSize: 13,
+                              color: AppTheme.inkSecondary,
+                              height: 1.4,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          step['description'] as String,
-                          style: AppTheme.sansBody.copyWith(
-                            fontSize: 13,
-                            color: AppTheme.inkSecondary,
-                            height: 1.4,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 ),

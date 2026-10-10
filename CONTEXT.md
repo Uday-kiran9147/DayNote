@@ -172,15 +172,27 @@ daynote/
    - All todo mutations (`addTodo`, `toggleTodo`, `updateTodoText`, `updateTodoPriority`, `deleteTodo`, `reorderTodos`) update in-memory state and notify listeners synchronously (0ms perceived latency).
    - A snapshot of previous state is captured prior to mutations. If storage persistence or remote sync fails, the viewmodel automatically reverts to the previous snapshot, restores the calendar indicator dots, surfaces an error message, and declarative listeners immediately restore the UI.
 
+5. **Adaptive & Responsive Layout Architecture**:
+   - `HomeScreen` and `DaynoteAppBar` are wrapped in a centered `ConstrainedBox(maxWidth: 720)` preserving the comfortable, minimal desk planner aspect ratio on iPads, tablets, foldables, and wide desktop displays without awkward card stretching.
+   - `AuthScreen` is centered with `ConstrainedBox(maxWidth: 440)` for comfortable form input.
+   - `MonthYearPickerSheet` and `AccountSheet` support landscape mode and varying screen heights via `isScrollControlled: true`, `SingleChildScrollView`, and `ConstrainedBox(maxWidth: 540)`.
+   - Dynamic scaling via `FittedBox` on calendar days and weekday headers ensures zero clipping on narrow 320px devices (e.g. iPhone SE) and under high accessibility font scaling (`TextScaler.linear(1.8x - 2.0x)`).
+   - Flexible text wrapping (`Wrap` inside `Expanded`) ensures todo item text, priority badges, and date headers wrap naturally without pushing action buttons off-screen.
+
+6. **Sentence Capitalization & Clean Typography**:
+   - Integrated `textCapitalization: TextCapitalization.sentences` across daily task and journal note inputs so mobile keyboards automatically capitalize the start of each sentence.
+   - Intelligent input normalization automatically capitalizes the first character of tasks even when typed quickly in lowercase or on desktop keyboards (`_capitalizeSentence`), ensuring consistent and elegant diary entries.
+   - Authentication fields enforce `textCapitalization: TextCapitalization.none` for strict email and password accuracy.
+
 ---
 
 ## 6. Development & Verification Commands
 
-- **Run all tests**:
+- **Run all tests** (Unit, Widget, and Responsive Layout tests):
   ```bash
   flutter test
   ```
-- **Code analyzer**:
+- **Code analyzer** (0 issues):
   ```bash
   flutter analyze
   ```
@@ -192,3 +204,4 @@ daynote/
   ```bash
   flutter run
   ```
+

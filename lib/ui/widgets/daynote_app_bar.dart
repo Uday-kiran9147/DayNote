@@ -37,37 +37,42 @@ class DaynoteAppBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Left: Brand Logo & Title
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: AppTheme.inkPrimary,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'D',
-                  style: AppTheme.sansButton.copyWith(
-                    color: AppTheme.paperBackground,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppTheme.inkPrimary,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'D',
+                    style: AppTheme.sansButton.copyWith(
+                      color: AppTheme.paperBackground,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 9),
-              Text(
-                'DAYNOTE',
-                style: AppTheme.sansBody.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 15,
-                  letterSpacing: 2.0,
-                  color: AppTheme.inkPrimary,
+                const SizedBox(width: 9),
+                Flexible(
+                  child: Text(
+                    'DAYNOTE',
+                    style: AppTheme.sansBody.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      letterSpacing: 2.0,
+                      color: AppTheme.inkPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           // Right: Today Shortcut & Account

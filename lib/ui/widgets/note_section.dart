@@ -133,6 +133,7 @@ class _NoteSectionState extends State<NoteSection> {
               maxLines: null,
               minLines: 4,
               keyboardType: TextInputType.multiline,
+              textCapitalization: TextCapitalization.sentences,
               style: AppTheme.sansNoteText,
               cursorColor: AppTheme.inkPrimary,
               scrollPadding: const EdgeInsets.only(top: 24, bottom: 120),

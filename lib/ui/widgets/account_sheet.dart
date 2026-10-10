@@ -20,6 +20,7 @@ class AccountSheet extends StatelessWidget {
     return showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.paperBackground,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -36,12 +37,15 @@ class AccountSheet extends StatelessWidget {
     final email = user?.email ?? 'Journalist';
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 540),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
             // Drag handle
             Center(
               child: Container(
@@ -121,7 +125,7 @@ class AccountSheet extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
                         ),
                       ],
                     ),
@@ -181,7 +185,9 @@ class AccountSheet extends StatelessWidget {
                 await authViewModel.signOut();
               },
             ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );

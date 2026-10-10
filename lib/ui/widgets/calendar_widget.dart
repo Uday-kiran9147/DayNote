@@ -183,11 +183,14 @@ class CalendarWidget extends StatelessWidget {
           final isWeekend = day == 'Sat' || day == 'Sun';
           return Expanded(
             child: Center(
-              child: Text(
-                day,
-                style: AppTheme.sansCaption.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: isWeekend ? AppTheme.accentBrown : AppTheme.inkTertiary,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  day,
+                  style: AppTheme.sansCaption.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isWeekend ? AppTheme.accentBrown : AppTheme.inkTertiary,
+                  ),
                 ),
               ),
             ),
@@ -342,12 +345,15 @@ class CalendarWidget extends StatelessWidget {
             // Date Number Text
             Padding(
               padding: const EdgeInsets.only(bottom: 2.0),
-              child: Text(
-                '${date.day}',
-                style: AppTheme.sansBody.copyWith(
-                  fontSize: 13.5,
-                  fontWeight: fontWeight,
-                  color: textColor,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '${date.day}',
+                  style: AppTheme.sansBody.copyWith(
+                    fontSize: 13.5,
+                    fontWeight: fontWeight,
+                    color: textColor,
+                  ),
                 ),
               ),
             ),
