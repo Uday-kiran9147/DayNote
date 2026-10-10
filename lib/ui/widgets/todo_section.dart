@@ -163,19 +163,77 @@ class _TodoSectionState extends State<TodoSection> {
     });
   }
 
-  void _submitEditing(String id) {
+  Future<bool> _confirmDeleteTodo(BuildContext context, TodoItem todo) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.paperBackground,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: AppTheme.separatorBeige),
+        ),
+        title: Text(
+          'Delete item?',
+          style: AppTheme.serifHeading.copyWith(fontSize: 17),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${todo.text}"?',
+          style: AppTheme.sansBody.copyWith(
+            color: AppTheme.inkSecondary,
+            fontSize: 14,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'Cancel',
+              style: AppTheme.sansButton.copyWith(
+                color: AppTheme.inkSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.priorityHigh,
+            ),
+            child: Text(
+              'Delete',
+              style: AppTheme.sansButton.copyWith(
+                color: AppTheme.priorityHigh,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  void _submitEditing(String id) async {
     final text = _editController.text.trim();
     if (text.isNotEmpty) {
       widget.onUpdateTodo(id, text);
       if (widget.onUpdatePriority != null && _editingPriority != widget.todos.firstWhere((t) => t.id == id).priority) {
         widget.onUpdatePriority!(id, _editingPriority);
       }
+      setState(() {
+        _editingTodoId = null;
+      });
     } else {
-      widget.onDeleteTodo(id);
+      final todo = widget.todos.firstWhere((t) => t.id == id);
+      final confirmed = await _confirmDeleteTodo(context, todo);
+      if (confirmed) {
+        widget.onDeleteTodo(id);
+        setState(() {
+          _editingTodoId = null;
+        });
+      }
     }
-    setState(() {
-      _editingTodoId = null;
-    });
   }
 
   Widget _buildPriorityBadge(TodoPriority priority, {VoidCallback? onTap, bool showNone = false}) {
@@ -352,6 +410,7 @@ class _TodoSectionState extends State<TodoSection> {
                 maxLength: TodoItem.maxTextLength,
                 buildCounter: (context, {required currentLength, required isFocused, required maxLength}) => null,
                 onSubmitted: (_) => _submitEditing(todo.id),
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   isDense: true,
@@ -401,6 +460,7 @@ class _TodoSectionState extends State<TodoSection> {
           color: AppTheme.accentBrown,
         ),
       ),
+      confirmDismiss: (_) => _confirmDeleteTodo(context, todo),
       onDismissed: (_) => widget.onDeleteTodo(todo.id),
       child: InkWell(
         onTap: () => widget.onToggleTodo(todo.id),
@@ -450,7 +510,12 @@ class _TodoSectionState extends State<TodoSection> {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                onPressed: () => widget.onDeleteTodo(todo.id),
+                onPressed: () async {
+                  final confirmed = await _confirmDeleteTodo(context, todo);
+                  if (confirmed) {
+                    widget.onDeleteTodo(todo.id);
+                  }
+                },
               ),
             ],
           ),
@@ -495,6 +560,7 @@ class _TodoSectionState extends State<TodoSection> {
               ],
               maxLength: TodoItem.maxTextLength,
               buildCounter: (context, {required currentLength, required isFocused, required maxLength}) => null,
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(
                 hintText: 'What needs to be done?',
                 hintStyle: AppTheme.sansBody.copyWith(

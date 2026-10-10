@@ -73,10 +73,11 @@ The project strictly follows the official [Flutter App Architecture Guide (MVVM 
      - `calendar_widget.dart`: Monthly grid, content indicator dots (`•`), and segmented month steppers (`‹ | ›`).
      - `month_year_picker_sheet.dart`: 25-year picker and 12-month navigation modal.
      - `selected_date_header.dart`: Prominent date display and section separator.
-     - `todo_section.dart`: Daily checklist with custom checkboxes, priority cycle badges (High/Med/Low), inline priority selector, and editing.
-     - `note_section.dart`: Paper writing surface with auto-save.
+     - `todo_section.dart`: Daily checklist with custom checkboxes, priority cycle badges (High/Med/Low), inline priority selector, delete confirmation safeguards, and editing.
+     - `note_section.dart`: Paper writing surface with auto-save and focus auto-scrolling.
+     - `onboarding_dialog.dart`: Walkthrough carousel modal explaining calendar navigation, priorities, and notes, with sample journal loading.
      - `empty_day_view.dart`: Clean empty state with "+ Add Todo" and "+ Add Note" shortcuts.
-     - `account_sheet.dart`: Account details and one-tap sign-out modal.
+     - `account_sheet.dart`: Account details, replay walkthrough option, and one-tap sign-out modal.
      - `classic_checkbox.dart`: Custom antique minimal checkbox.
 
 ---
@@ -122,6 +123,7 @@ daynote/
 │   │       ├── empty_day_view.dart
 │   │       ├── month_year_picker_sheet.dart
 │   │       ├── note_section.dart
+│   │       ├── onboarding_dialog.dart
 │   │       ├── selected_date_header.dart
 │   │       └── todo_section.dart
 │   ├── viewmodels/
@@ -158,9 +160,10 @@ daynote/
    - `DayNoteViewModel.onNoteChanged` buffers note text in memory and debounces repository writes (`600ms`) without triggering `notifyListeners()` on every keypress.
    - `NoteSection` maintains an independent text controller keyed by `entry.dateKey`, preventing cursor fighting and layout flickering.
 
-2. **Smooth Keyboard & Keyboard-Aware Auto-Scrolling**:
+2. **Smooth Keyboard, Tap-Outside Dismissal, & Auto-Scrolling**:
    - `CustomScrollView` uses `keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag` and `BouncingScrollPhysics`.
-   - `TodoSection` and `NoteSection` feature automated focus-aware scroll positioning using `Scrollable.ensureVisible` and generous `scrollPadding: const EdgeInsets.only(top: 24, bottom: 120)` to automatically scroll focused fields into full view when the software keyboard appears or when adding items.
+   - `HomeScreen`, `AuthScreen`, `TodoSection`, and `NoteSection` implement comprehensive tap-outside dismissal via `GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => FocusScope.of(context).unfocus())` and `TextField.onTapOutside`.
+   - Automated focus-aware scroll positioning using `Scrollable.ensureVisible` and generous `scrollPadding: const EdgeInsets.only(top: 24, bottom: 120)` smoothly brings active fields into view above the soft keyboard.
 
 3. **Multiplatform Firebase Resilience**:
    - `main.dart` safely attempts `Firebase.initializeApp()` with fallback to `MockAuthService` when running offline or in environments without native services.

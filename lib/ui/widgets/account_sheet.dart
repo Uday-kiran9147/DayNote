@@ -4,20 +4,29 @@ import '../theme/app_theme.dart';
 
 class AccountSheet extends StatelessWidget {
   final AuthViewModel authViewModel;
+  final VoidCallback? onOpenWalkthrough;
 
   const AccountSheet({
     super.key,
     required this.authViewModel,
+    this.onOpenWalkthrough,
   });
 
-  static Future<void> show(BuildContext context, {required AuthViewModel authViewModel}) {
+  static Future<void> show(
+    BuildContext context, {
+    required AuthViewModel authViewModel,
+    VoidCallback? onOpenWalkthrough,
+  }) {
     return showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.paperBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => AccountSheet(authViewModel: authViewModel),
+      builder: (context) => AccountSheet(
+        authViewModel: authViewModel,
+        onOpenWalkthrough: onOpenWalkthrough,
+      ),
     );
   }
 
@@ -121,7 +130,33 @@ class AccountSheet extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            if (onOpenWalkthrough != null) ...[
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.inkPrimary,
+                  side: const BorderSide(color: AppTheme.separatorBeige, width: 1.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.help_outline, size: 18, color: AppTheme.accentBrown),
+                label: Text(
+                  'How to Use Daynote',
+                  style: AppTheme.sansButton.copyWith(
+                    color: AppTheme.inkPrimary,
+                    fontSize: 13.5,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onOpenWalkthrough?.call();
+                },
+              ),
+              const SizedBox(height: 10),
+            ],
 
             // Sign Out Button
             OutlinedButton.icon(

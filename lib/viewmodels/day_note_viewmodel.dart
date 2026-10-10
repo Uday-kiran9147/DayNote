@@ -16,6 +16,8 @@ class DayNoteViewModel extends ChangeNotifier {
   bool _isNoteFieldFocused = false;
   String? _errorMessage;
 
+  bool _shouldShowOnboarding = false;
+
   Timer? _noteDebounceTimer;
 
   DayNoteViewModel({required this.repository})
@@ -39,6 +41,7 @@ class DayNoteViewModel extends ChangeNotifier {
   bool get isAddingTodo => _isAddingTodo;
   bool get isNoteFieldFocused => _isNoteFieldFocused;
   String? get errorMessage => _errorMessage;
+  bool get shouldShowOnboarding => _shouldShowOnboarding;
 
   void clearError() {
     _errorMessage = null;
@@ -58,6 +61,8 @@ class DayNoteViewModel extends ChangeNotifier {
 
     try {
       await repository.initialize();
+      final seen = await repository.hasSeenOnboarding();
+      _shouldShowOnboarding = !seen;
       await _refreshDatesWithContent();
       await _loadEntryForDate(_selectedDate);
     } catch (e) {
@@ -66,6 +71,18 @@ class DayNoteViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> dismissOnboarding({bool loadSampleData = false}) async {
+    await repository.setOnboardingSeen(true);
+    _shouldShowOnboarding = false;
+
+    if (loadSampleData) {
+      await repository.loadSampleData();
+      await _refreshDatesWithContent();
+      await _loadEntryForDate(_selectedDate);
+    }
+    notifyListeners();
   }
 
   Future<void> updateUserContext(String? userId) async {

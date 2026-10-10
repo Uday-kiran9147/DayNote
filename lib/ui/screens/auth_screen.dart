@@ -60,13 +60,16 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.paperBackground,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-            physics: const BouncingScrollPhysics(),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppTheme.paperBackground,
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+              physics: const BouncingScrollPhysics(),
             child: ListenableBuilder(
               listenable: widget.authViewModel,
               builder: (context, _) {
@@ -390,7 +393,8 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildTextField({
@@ -429,6 +433,7 @@ class _AuthScreenState extends State<AuthScreen> {
             keyboardType: keyboardType,
             obscureText: obscureText,
             style: AppTheme.sansBody,
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: AppTheme.sansBody.copyWith(

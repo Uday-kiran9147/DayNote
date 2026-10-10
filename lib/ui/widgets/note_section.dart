@@ -136,6 +136,7 @@ class _NoteSectionState extends State<NoteSection> {
               style: AppTheme.sansNoteText,
               cursorColor: AppTheme.inkPrimary,
               scrollPadding: const EdgeInsets.only(top: 24, bottom: 120),
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(
                 hintText: 'Record your thoughts, reflections, or notes for the day...',
                 hintStyle: AppTheme.sansNoteText.copyWith(

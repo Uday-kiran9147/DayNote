@@ -14,5 +14,9 @@ abstract class DayNoteRepository {
   Future<DayEntry> deleteTodo(DateTime date, String todoId);
   Future<DayEntry> reorderTodos(DateTime date, int oldIndex, int newIndex);
   Future<DayEntry> updateNote(DateTime date, String noteText);
+  Future<bool> hasSeenOnboarding();
+  Future<void> setOnboardingSeen(bool seen);
+  Future<void> loadSampleData();
 }
+
 

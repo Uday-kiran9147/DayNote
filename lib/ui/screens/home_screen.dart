@@ -7,6 +7,7 @@ import '../widgets/calendar_widget.dart';
 import '../widgets/daynote_app_bar.dart';
 import '../widgets/empty_day_view.dart';
 import '../widgets/note_section.dart';
+import '../widgets/onboarding_dialog.dart';
 import '../widgets/selected_date_header.dart';
 import '../widgets/todo_section.dart';
 
@@ -28,11 +29,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _forceShowTodoInput = false;
   bool _forceFocusNote = false;
+  bool _hasCheckedOnboarding = false;
 
   @override
   void initState() {
     super.initState();
     widget.viewModel.addListener(_onViewModelStateChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowOnboarding();
+    });
   }
 
   @override
@@ -42,7 +47,27 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  void _checkAndShowOnboarding() {
+    if (widget.viewModel.shouldShowOnboarding && !_hasCheckedOnboarding && mounted) {
+      _hasCheckedOnboarding = true;
+      OnboardingDialog.show(
+        context,
+        onStartBlank: () => widget.viewModel.dismissOnboarding(loadSampleData: false),
+        onStartWithSample: () => widget.viewModel.dismissOnboarding(loadSampleData: true),
+      );
+    }
+  }
+
+  void _showWalkthroughManual() {
+    OnboardingDialog.show(
+      context,
+      onStartBlank: () => widget.viewModel.dismissOnboarding(loadSampleData: false),
+      onStartWithSample: () => widget.viewModel.dismissOnboarding(loadSampleData: true),
+    );
+  }
+
   void _onViewModelStateChanged() {
+    _checkAndShowOnboarding();
     if (widget.viewModel.errorMessage != null && mounted) {
       final msg = widget.viewModel.errorMessage!;
       widget.viewModel.clearError();
@@ -99,21 +124,24 @@ class _HomeScreenState extends State<HomeScreen> {
         final hasNotes = entry.note.trim().isNotEmpty;
         final isEmptyDay = !hasTodos && !hasNotes && !_forceShowTodoInput && !_forceFocusNote;
 
-        return Scaffold(
-          backgroundColor: AppTheme.paperBackground,
-          body: SafeArea(
-            child: Column(
-              children: [
-                // Refined Top App Bar
-                DaynoteAppBar(
-                  authViewModel: widget.authViewModel,
-                  onGoToToday: vm.goToToday,
-                  isTodaySelected: vm.isSelectedDateToday,
-                ),
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            backgroundColor: AppTheme.paperBackground,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // Refined Top App Bar
+                  DaynoteAppBar(
+                    authViewModel: widget.authViewModel,
+                    onGoToToday: vm.goToToday,
+                    isTodaySelected: vm.isSelectedDateToday,
+                  ),
 
-                // Main Scrollable Content
-                Expanded(
-                  child: CustomScrollView(
+                  // Main Scrollable Content
+                  Expanded(
+                    child: CustomScrollView(
                     controller: _scrollController,
                     keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                     physics: const AlwaysScrollableScrollPhysics(
@@ -141,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? () => AccountSheet.show(
                                     context,
                                     authViewModel: widget.authViewModel!,
+                                    onOpenWalkthrough: _showWalkthroughManual,
                                   )
                               : null,
                         ),
@@ -225,8 +254,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     ),
-  );
-},
+  ),
 );
+      },
+    );
   }
 }
+

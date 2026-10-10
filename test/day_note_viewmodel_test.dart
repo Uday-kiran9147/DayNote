@@ -103,7 +103,25 @@ void main() {
     viewModel.clearError();
     expect(viewModel.errorMessage, isNull);
   });
+
+  test('DayNoteViewModel handles onboarding flow and loads sample data correctly', () async {
+    final repository = DayNoteRepositoryImpl();
+    final viewModel = DayNoteViewModel(repository: repository);
+    await viewModel.init();
+
+    expect(viewModel.shouldShowOnboarding, isTrue);
+
+    // Dismiss onboarding with sample data
+    await viewModel.dismissOnboarding(loadSampleData: true);
+    expect(viewModel.shouldShowOnboarding, isFalse);
+
+    // Verify sample data loaded for today
+    expect(viewModel.currentEntry.todos.isNotEmpty, isTrue);
+    expect(viewModel.currentEntry.note.contains('Welcome to your Daynote journal'), isTrue);
+    expect(viewModel.datesWithContent.length, greaterThanOrEqualTo(2));
+  });
 }
+
 
 class FailingDayNoteRepository extends DayNoteRepositoryImpl {
   @override

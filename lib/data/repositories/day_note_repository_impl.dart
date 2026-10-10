@@ -222,4 +222,20 @@ class DayNoteRepositoryImpl implements DayNoteRepository {
     await saveDayEntry(updatedEntry);
     return updatedEntry;
   }
+
+  @override
+  Future<bool> hasSeenOnboarding() {
+    return _storageService.hasSeenOnboarding();
+  }
+
+  @override
+  Future<void> setOnboardingSeen(bool seen) {
+    return _storageService.setOnboardingSeen(seen);
+  }
+
+  @override
+  Future<void> loadSampleData() async {
+    await _storageService.seedSampleData();
+  }
 }
+

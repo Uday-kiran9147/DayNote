@@ -72,6 +72,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Dismiss onboarding popup if present
+    if (find.text('Start with Blank Journal').evaluate().isNotEmpty) {
+      await tester.tap(find.text('Start with Blank Journal'));
+      await tester.pumpAndSettle();
+    }
+
     // Verify DaynoteAppBar brand title
     expect(find.text('DAYNOTE'), findsOneWidget);
     expect(find.text('Today'), findsOneWidget);
@@ -113,6 +119,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Dismiss onboarding popup
+    if (find.text('Start with Blank Journal').evaluate().isNotEmpty) {
+      await tester.tap(find.text('Start with Blank Journal'));
+      await tester.pumpAndSettle();
+    }
+
     // Click + Add Todo from empty state
     await tester.tap(find.text('+ Add Todo'));
     await tester.pumpAndSettle();
@@ -137,6 +149,55 @@ void main() {
     await tester.tap(find.text('High'));
     await tester.pumpAndSettle();
     expect(find.text('Med'), findsOneWidget);
+
+    // Tap delete button to open confirmation dialog
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    // Verify confirmation dialog appears
+    expect(find.text('Delete item?'), findsOneWidget);
+    expect(find.text('Are you sure you want to delete "Urgent client meeting"?'), findsOneWidget);
+
+    // Tap Cancel -> todo remains
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Urgent client meeting'), findsOneWidget);
+
+    // Tap delete again and confirm Delete -> todo is deleted
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Urgent client meeting'), findsNothing);
+  });
+
+  testWidgets('Onboarding walkthrough popup displays and loads sample data on request', (WidgetTester tester) async {
+    final repository = DayNoteRepositoryImpl();
+    final viewModel = DayNoteViewModel(repository: repository);
+    await viewModel.init();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HomeScreen(viewModel: viewModel),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify onboarding popup appears
+    expect(find.text('WELCOME TO DAYNOTE'), findsOneWidget);
+    expect(find.text('The Daily Calendar'), findsOneWidget);
+    expect(find.text('Explore with Sample Entries'), findsOneWidget);
+
+    // Tap Explore with Sample Entries
+    await tester.tap(find.text('Explore with Sample Entries'));
+    await tester.pumpAndSettle();
+
+    // Verify onboarding dismissed and sample todos/notes displayed
+    expect(find.text('WELCOME TO DAYNOTE'), findsNothing);
+    expect(find.text('Explore the month & year calendar navigation'), findsOneWidget);
+    expect(find.textContaining('Welcome to your Daynote journal'), findsOneWidget);
   });
 }
+
+
 
