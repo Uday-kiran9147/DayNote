@@ -67,7 +67,7 @@ class DayNoteApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Daynote',
+      title: 'DayNote',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.themeData,
       home: AuthGate(
